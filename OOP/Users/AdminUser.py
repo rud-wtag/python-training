@@ -3,7 +3,7 @@ from User import User
 
 class AdminUser(User):
   def __init__(self, name, email, password, role="Admin"):
-    super().__init__(name, email, password)
+    super().__init__(name, email, password, role=role)
     self.role = role
 
   def login(self):

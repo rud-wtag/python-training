@@ -1,0 +1,95 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  simple:
+    format: '%(asctime)s - %(filename)s- %(name)s - %(module)s - %(levelname)s - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+  json:
+    (): mylogger.MyJSONFormatter
+    fmt_keys:
+      level: levelname
+      message: message
+      timestamp: timestamp
+      logger: name
+      module: module
+      function: funcName
+      line: lineno
+      thread_name: threadName
+
+filters:
+  no_errors:
+    (): mylogger.NonErrorFilter
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+
+  file:
+    class: logging.FileHandler
+    level: INFO
+    formatter: simple
+    filename: myapp.log
+    mode: a
+
+  file_with_rotation:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: simple
+    filename: my_app.log
+    maxBytes: 10
+    backupCount: 10
+
+  file_with_filter:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: simple
+    filename: filtered.log
+    mode: a
+    filters:
+    - no_errors
+    
+  file_json:
+    class: logging.FileHandler
+    level: INFO
+    formatter: json
+    filename: json.log
+    mode: a
+  
+loggers:
+  development:
+    level: DEBUG
+    handlers: [console, file]
+    propagate: no
+
+  staging:
+    level: INFO
+    handlers: [console, file]
+    propagate: no
+
+  production:
+    level: WARNING
+    handlers: [file]
+    propagate: no
+
+  rotator:
+    level: WARNING
+    handlers: [file_with_rotation]
+    propagate: no
+  
+  filter:
+    level: DEBUG
+    handlers: [file_with_filter]
+    propagate: no
+
+  json:
+    level: INFO
+    handlers: [file_json]
+    propagate: no
+
+root:
+  level: ERROR
+  handlers: [console, file]
